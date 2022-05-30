@@ -1,16 +1,21 @@
+import { Container } from './Container/Container';
+import { ContactForm } from './ContactForm/ContactForm';
+import { Filter } from './Filter/Filter';
+import { ContactList } from './ContactList/ContactList';
+import { useGetContactsQuery } from 'redux/contactApi';
+
 export const App = () => {
+  const { data } = useGetContactsQuery();
   return (
-    <div
-      style={{
-        height: '100vh',
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        fontSize: 40,
-        color: '#010101'
-      }}
-    >
-      React homework template
-    </div>
+    <>
+      <Container title="Phonebook">
+        <ContactForm />
+      </Container>
+
+      <Container title="Contacts">
+        <Filter />
+        {data ? <ContactList /> : <p>Contact list is empty.</p>}
+      </Container>
+    </>
   );
 };
