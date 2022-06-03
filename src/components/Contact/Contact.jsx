@@ -2,8 +2,12 @@ import PropTypes from 'prop-types';
 import { Wrapper, Icon, Number, Button } from './Contact.styled';
 import { FaUser } from 'react-icons/fa';
 import { TiDelete } from 'react-icons/ti';
+import { useDispatch } from 'react-redux';
+import { deleteContact } from 'redux/contacts/contactOperations';
 
-export const Contact = ({ id, name, number, onDeleteContact }) => {
+export const Contact = ({ name, number, id }) => {
+  const dispatch = useDispatch();
+
   return (
     <>
       <Wrapper>
@@ -14,7 +18,7 @@ export const Contact = ({ id, name, number, onDeleteContact }) => {
       </Wrapper>
       <Wrapper>
         <Number>{number}</Number>
-        <Button type="button" onClick={() => onDeleteContact(id)}>
+        <Button type="button" onClick={() => dispatch(deleteContact(id))}>
           <TiDelete size="50px" />
         </Button>
       </Wrapper>

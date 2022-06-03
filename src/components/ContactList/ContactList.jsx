@@ -1,22 +1,22 @@
-import { useSelector } from 'react-redux';
-import { getFilter } from 'redux/selectors';
+import { useDispatch, useSelector } from 'react-redux';
+import { useEffect } from 'react';
 import { Contact } from 'components/Contact/Contact';
-import {
-  useGetContactsQuery,
-  useDeleteContactMutation,
-} from 'redux/contactApi';
 import { Item } from './ContactList.styled';
+import { contactsSelectors } from 'redux/contacts/contactsSelectors';
+import { fetchContacts } from 'redux/contacts/contactOperations';
 
 export const ContactList = () => {
-  const { data } = useGetContactsQuery();
-  const filter = useSelector(getFilter);
+  const dispatch = useDispatch();
+  const contacts = useSelector(contactsSelectors.getContacts);
+  const filter = useSelector(contactsSelectors.getFilter);
 
-  const [deleteContact] = useDeleteContactMutation();
-  const onDeleteContact = id => deleteContact(id);
+  useEffect(() => {
+    dispatch(fetchContacts());
+  }, [dispatch]);
 
   const filteredContacts = () => {
     const normalizedFilter = filter.toLowerCase();
-    return data.filter(contact =>
+    return contacts.filter(contact =>
       contact.name.toLowerCase().includes(normalizedFilter)
     );
   };
@@ -24,17 +24,12 @@ export const ContactList = () => {
   const filteredContactsList = filteredContacts();
 
   return (
-    data && (
+    contacts && (
       <ul>
         {filteredContactsList.map(({ id, name, number }) => {
           return (
             <Item key={id}>
-              <Contact
-                name={name}
-                number={number}
-                onDeleteContact={onDeleteContact}
-                id={id}
-              />
+              <Contact name={name} number={number} id={id} />
             </Item>
           );
         })}

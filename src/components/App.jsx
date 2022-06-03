@@ -1,21 +1,60 @@
-import { Container } from './Container/Container';
-import { ContactForm } from './ContactForm/ContactForm';
-import { Filter } from './Filter/Filter';
-import { ContactList } from './ContactList/ContactList';
-import { useGetContactsQuery } from 'redux/contactApi';
+import { Route, Routes } from 'react-router-dom';
+import { lazy, Suspense, useEffect } from 'react';
+import { Layout } from 'components/Layout/Layout';
+import { authOperations } from 'redux/auth/authOperation';
+import { useDispatch, useSelector } from 'react-redux';
+import { PrivateRoute } from './PrivateRoute/PrivateRoute';
+import { PublicRoute } from './PublicRoute/PublicRoute';
+import { authSelectors } from 'redux/auth/authSelectors';
+
+const HomePage = lazy(() => import('../pages/homePage'));
+const ContactsPage = lazy(() => import('../pages/contactsPage'));
+const LoginPage = lazy(() => import('../pages/loginPage'));
+const RegistrationPage = lazy(() => import('../pages/registrationPage'));
 
 export const App = () => {
-  const { data } = useGetContactsQuery();
-  return (
-    <>
-      <Container title="Phonebook">
-        <ContactForm />
-      </Container>
+  const dispatch = useDispatch();
+  const isFetchingCurrentUser = useSelector(
+    authSelectors.getIsFetchingCurrentUser
+  );
 
-      <Container title="Contacts">
-        <Filter />
-        {data ? <ContactList /> : <p>Contact list is empty.</p>}
-      </Container>
-    </>
+  useEffect(() => {
+    dispatch(authOperations.fetchCurrentUser());
+  }, [dispatch]);
+
+  return isFetchingCurrentUser ? (
+    <p>Loading...</p>
+  ) : (
+    <Suspense>
+      <Routes>
+        <Route path="/" element={<Layout />}>
+          <Route index element={<HomePage />} />
+          <Route
+            path="contacts"
+            element={
+              <PrivateRoute>
+                <ContactsPage />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="login"
+            element={
+              <PublicRoute restricted>
+                <LoginPage />
+              </PublicRoute>
+            }
+          />
+          <Route
+            path="register"
+            element={
+              <PublicRoute restricted>
+                <RegistrationPage />
+              </PublicRoute>
+            }
+          />
+        </Route>
+      </Routes>
+    </Suspense>
   );
 };

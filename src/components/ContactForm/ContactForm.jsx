@@ -1,23 +1,22 @@
-import { Label, Title, Input, Button } from './ContactForm.styled';
-import {
-  useGetContactsQuery,
-  useAddContactMutation,
-} from '../../redux/contactApi';
-import { Report } from 'notiflix';
-import { nanoid } from 'nanoid';
 import { useState } from 'react';
+import { Label, Title, Input, Button } from './ContactForm.styled';
+import { Report } from 'notiflix';
+import { useDispatch, useSelector } from 'react-redux';
+import { addContact } from 'redux/contacts/contactOperations';
+import { contactsSelectors } from 'redux/contacts/contactsSelectors';
 
 export const ContactForm = () => {
   const [name, setName] = useState('');
   const [number, setNumber] = useState('');
+  const contacts = useSelector(contactsSelectors.getContacts);
+  const dispatch = useDispatch();
+
   const onChangeName = e => setName(e.currentTarget.value);
   const onChangeNumber = e => setNumber(e.currentTarget.value);
 
-  const { data: contacts } = useGetContactsQuery();
-  const [newContact] = useAddContactMutation();
-
-  const onSubmitForm = async e => {
+  const onSubmitForm = e => {
     e.preventDefault();
+    const newContact = { name, number };
 
     if (
       contacts.some(
@@ -31,7 +30,8 @@ export const ContactForm = () => {
       );
       return;
     }
-    await newContact({ id: nanoid(), name, number });
+
+    dispatch(addContact(newContact));
 
     resetForm();
   };

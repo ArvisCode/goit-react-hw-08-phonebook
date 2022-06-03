@@ -1,11 +1,12 @@
 import { useDispatch } from 'react-redux';
-import { changeFilter } from 'redux/contactsSlice';
+import { contactsSlice } from 'redux/contacts/contactsSlice';
 import { Label, Text, Input } from './Filter.styled';
 
 export const Filter = () => {
   const dispatch = useDispatch();
 
-  const changeFieldFilter = e => dispatch(changeFilter(e.currentTarget.value));
+  const changeFieldFilter = e =>
+    dispatch(contactsSlice.actions.filteredContact(e.currentTarget.value));
 
   return (
     <Label>
